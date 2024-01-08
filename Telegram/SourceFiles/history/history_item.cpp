@@ -1553,6 +1553,7 @@ bool HistoryItem::isUserpicSuggestion() const {
 }
 
 void HistoryItem::destroy() {
+	return; // SMFgram feat: Anti-withdrawal
 	_history->destroyMessage(this);
 }
 

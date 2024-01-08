@@ -494,7 +494,7 @@ void History::destroyMessage(not_null<HistoryItem*> item) {
 	if (item->isSending()) {
 		session().api().cancelLocalItem(item);
 	}
-
+	
 	const auto documentToCancel = [&] {
 		const auto media = item->isAdminLogEntry()
 			? nullptr

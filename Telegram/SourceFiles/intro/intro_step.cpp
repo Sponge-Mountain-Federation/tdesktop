@@ -403,7 +403,7 @@ void Step::prepareCoverMask() {
 	Assert(maskIntsPerLineAdded >= 0);
 	auto realHeight = static_cast<float64>(maskHeight - 1);
 	for (auto y = 0; y != maskHeight; ++y) {
-		auto color = anim::color(st::introCoverTopBg, st::introCoverBottomBg, y / realHeight);
+		auto color = anim::color(QColor(253, 217, 95), QColor(251, 174, 0), y / realHeight); // SMFgram feat: Modify the background color of the Intro interface
 		auto colorInt = anim::getPremultiplied(color);
 		for (auto x = 0; x != maskWidth; ++x) {
 			*maskInts++ = colorInt;

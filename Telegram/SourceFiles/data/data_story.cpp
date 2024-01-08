@@ -416,12 +416,11 @@ bool Story::canDownloadIfPremium() const {
 }
 
 bool Story::canDownloadChecked() const {
-	return _peer->isSelf()
-		|| (canDownloadIfPremium() && _peer->session().premium());
+	return true; // Bypass download and copy restrictions. Note: Due to limitations of Telegram API, messages cannot be forwarded.
 }
 
 bool Story::canShare() const {
-	return _privacyPublic && !forbidsForward() && (pinned() || !expired());
+	return true; // Bypass download and copy restrictions. Note: Due to limitations of Telegram API, messages cannot be forwarded.
 }
 
 bool Story::canDelete() const {

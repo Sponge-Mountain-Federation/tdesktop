@@ -843,7 +843,7 @@ void Histories::deleteMessages(const MessageIdsList &ids, bool revoke) {
 			}
 		}
 	}
-
+	
 	for (const auto &[history, ids] : idsByPeer) {
 		history->owner().histories().deleteMessages(history, ids, revoke);
 	}
