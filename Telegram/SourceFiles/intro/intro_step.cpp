@@ -435,8 +435,10 @@ void Step::paintCover(QPainter &p, int top) {
 		auto rightShown = qRound(shown * (right + st::introCoverRight.width()));
 		right = rightShown - st::introCoverRight.width();
 	}
-	st::introCoverLeft.paint(p, left, coverHeight - st::introCoverLeft.height(), width());
-	st::introCoverRight.paint(p, width() - right - st::introCoverRight.width(), coverHeight - st::introCoverRight.height(), width());
+	// SMF feat: Hardcoding the colors of the left and right OverIcons
+	const auto cOverIcons = QColor(255, 210, 34);
+	st::introCoverLeft.paint(p, left, coverHeight - st::introCoverLeft.height(), width(), cOverIcons);
+	st::introCoverRight.paint(p, width() - right - st::introCoverRight.width(), coverHeight - st::introCoverRight.height(), width(), cOverIcons);
 
 	auto planeLeft = (width() - st::introCoverIcon.width()) / 2 - st::introCoverIconLeft;
 	auto planeTop = top + st::introCoverIconTop;
@@ -447,6 +449,10 @@ void Step::paintCover(QPainter &p, int top) {
 	//	planeTop += top;
 	}
 	st::introCoverIcon.paint(p, planeLeft, planeTop, width());
+	// SMF feat: Process Trace separately
+	// see: intro.style - line 18 & line 20
+	const auto cOverPlaneTrace = QColor(255, 210, 34, 105);
+	st::introCoverTrace.paint(p, planeLeft, planeTop, width(), cOverPlaneTrace);
 }
 
 int Step::contentLeft() const {
