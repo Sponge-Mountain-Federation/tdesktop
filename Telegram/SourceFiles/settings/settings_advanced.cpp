@@ -48,6 +48,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "styles/style_menu_icons.h"
 #include "styles/style_settings.h"
 
+#include <iostream>
+#include <sstream>
+
 #ifdef Q_OS_MAC
 #include "base/platform/mac/base_confirm_quit.h"
 #endif // Q_OS_MAC
@@ -445,6 +448,18 @@ void SetupSystemIntegrationContent(
 			checkbox(std::move(label), checked),
 			st::settingsCheckboxPadding);
 	};
+	const auto addStringCheckbox = [&](
+		QString label,
+		bool checked) {
+			
+			return container->add(
+				object_ptr<Ui::Checkbox>(
+					container,
+					std::move(label),
+					checked,
+					st::settingsCheckbox),
+				st::settingsCheckboxPadding);
+	};
 	const auto addSlidingCheckbox = [&](
 			rpl::producer<QString> &&label,
 			bool checked) {
@@ -603,8 +618,10 @@ void SetupSystemIntegrationContent(
 				&& !controller->session().domain().local().hasLocalPasscode();
 		};
 
-		const auto autostart = addCheckbox(
-			tr::lng_settings_auto_start(),
+		const auto autostart = addStringCheckbox(
+			//tr::lng_settings_auto_start(),
+			// SMFgram feat: Replace UI text
+			u"\x5f00\x673a\x542f\x52a8 SMFgram"_q,
 			cAutoStart());
 		const auto minimized = addSlidingCheckbox(
 			tr::lng_settings_start_min(),

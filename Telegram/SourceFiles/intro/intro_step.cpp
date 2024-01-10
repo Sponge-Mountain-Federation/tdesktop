@@ -437,7 +437,7 @@ namespace Intro {
 				auto rightShown = qRound(shown * (right + st::introCoverRight.width()));
 				right = rightShown - st::introCoverRight.width();
 			}
-			// SMF feat: Hardcoding the colors of the left and right OverIcons
+			// SMFgram feat: Hardcoding the colors of the left and right OverIcons
 			const auto cOverIcons = QColor(255, 210, 34);
 			st::introCoverLeft.paint(p, left, coverHeight - st::introCoverLeft.height(), width(), cOverIcons);
 			st::introCoverRight.paint(p, width() - right - st::introCoverRight.width(), coverHeight - st::introCoverRight.height(), width(), cOverIcons);
@@ -451,7 +451,7 @@ namespace Intro {
 				//	planeTop += top;
 			}
 			st::introCoverIcon.paint(p, planeLeft, planeTop, width());
-			// SMF feat: Process Trace separately
+			// SMFgram feat: Process Trace separately
 			// see: intro.style - line 18 & line 20
 			const auto cOverPlaneTrace = QColor(255, 210, 34, 105);
 			st::introCoverTrace.paint(p, planeLeft, planeTop, width(), cOverPlaneTrace);
