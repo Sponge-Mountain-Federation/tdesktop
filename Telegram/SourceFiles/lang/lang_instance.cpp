@@ -23,6 +23,7 @@ const auto kSerializeVersionTag = u"#new"_q;
 constexpr auto kSerializeVersion = 1;
 constexpr auto kCloudLangPackName = "tdesktop"_cs;
 constexpr auto kCustomLanguage = "#custom"_cs;
+constexpr auto kCustomBrand = "SMFgram"_cs;
 constexpr auto kLangValuesLimit = 20000;
 
 std::vector<QString> PrepareDefaultValues() {
@@ -726,11 +727,21 @@ QString Instance::getNonDefaultValue(const QByteArray &key) const {
 		: QString();
 }
 
+inline constexpr std::array hasTelegram = { 18, 20, 21, 405, 427, 463, 507, 514, 515, 532, 534, 535, 536, 540, 556, 579, 586, 658, 745, 764, 766, 768, 841, 843, 845, 847, 855, 872, 925, 926, 932, 1027, 1053, 1056, 1116, 1118, 1119, 1201, 1843, 2244, 2236, 3686, 3730, 3973, 3975, 4688, 4762, 4763, };
+
 void Instance::applyValue(const QByteArray &key, const QByteArray &value) {
 	_nonDefaultValues[key] = value;
 	ParseKeyValue(key, value, [&](ushort key, QString &&value) {
 		_nonDefaultSet[key] = 1;
 		if (!_derived) {
+			// SMFgram feat: Replace "Telegram" in part of the interface text with "SMFgram"
+			if (ranges::contains(hasTelegram, key)) {
+				auto v = std::move(value);
+				_values[key] = v.replace(
+					QRegularExpression("Telegram"),
+					kCustomBrand.utf16());
+				return;
+			}
 			_values[key] = std::move(value);
 		} else if (!_derived->_nonDefaultSet[key]) {
 			_derived->_values[key] = std::move(value);

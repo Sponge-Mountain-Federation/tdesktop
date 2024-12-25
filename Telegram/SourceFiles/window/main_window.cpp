@@ -864,7 +864,7 @@ void MainWindow::updateTitle() {
 		: Dialogs::Key();
 	const auto thread = key ? key.thread() : nullptr;
 	if (!thread) {
-		setTitle((user.isEmpty() ? u"Telegram"_q : user) + added);
+		setTitle((user.isEmpty() ? u"SMFgram"_q : user) + added);
 		return;
 	}
 	const auto history = thread->owningHistory();

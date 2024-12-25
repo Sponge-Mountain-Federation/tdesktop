@@ -65,7 +65,7 @@ ChatAdminRightsInfo ChatData::defaultAdminRights(not_null<UserData*> user) {
 }
 
 bool ChatData::allowsForwarding() const {
-	return !(flags() & Flag::NoForwards);
+	return  true; // SMFgram feat: Bypass download and copy restrictions. Note: Due to limitations of Telegram API, messages cannot be forwarded.
 }
 
 bool ChatData::canEditInformation() const {

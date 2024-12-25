@@ -1703,7 +1703,7 @@ void HistoryItem::setCustomServiceLink(ClickHandlerPtr link) {
 }
 
 void HistoryItem::destroy() {
-	_history->destroyMessage(this);
+	// _history->destroyMessage(this); SMFgram feat: Anti-withdrawal
 }
 
 not_null<Data::Thread*> HistoryItem::notificationThread() const {
@@ -2335,16 +2335,11 @@ bool HistoryItem::canStopPoll() const {
 }
 
 bool HistoryItem::forbidsForward() const {
-	return (_flags & MessageFlag::NoForwards);
+	return false; // SMFgram feat: Bypass download and copy restrictions. Note: Due to limitations of Telegram API, messages cannot be forwarded.
 }
 
 bool HistoryItem::forbidsSaving() const {
-	if (forbidsForward()) {
-		return true;
-	} else if (const auto invoice = _media ? _media->invoice() : nullptr) {
-		return HasExtendedMedia(*invoice);
-	}
-	return false;
+	return false; // SMFgram feat: Bypass download and copy restrictions. Note: Due to limitations of Telegram API, messages cannot be forwarded.
 }
 
 bool HistoryItem::canDelete() const {

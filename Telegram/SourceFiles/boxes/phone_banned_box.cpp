@@ -28,7 +28,7 @@ void SendToBannedHelp(const QString &phone) {
 
 	const auto body = qsl("\
 I'm trying to use my mobile phone number: ") + phone + qsl("\n\
-But Telegram says it's banned. Please help.\n\
+But SMFgram says it's banned. Please help.\n\
 \n\
 App version: ") + version + qsl("\n\
 OS version: ") + ::Platform::SystemVersionPretty() + qsl("\n\
