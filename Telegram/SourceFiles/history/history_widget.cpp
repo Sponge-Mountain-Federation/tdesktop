@@ -4110,7 +4110,10 @@ TextWithEntities HistoryWidget::prepareTextForEditMsg() const {
 }
 
 void HistoryWidget::saveEditMsg() {
-	Expects(_history != nullptr);
+	// Expects(_history != nullptr);
+	if (!_history || !_peer) {
+		return; // SMFgram: fix crash when using `anti-recall`
+	}
 
 	if (_saveEditMsgRequestId) {
 		return;

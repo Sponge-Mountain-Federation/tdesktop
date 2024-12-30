@@ -37,6 +37,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_file_click_handler.h"
 #include "api/api_transcribes.h"
 #include "apiwrap.h"
+#include "core/application.h"
+#include "core/core_settings.h"
 #include "styles/style_chat.h"
 #include "styles/style_dialogs.h"
 
@@ -321,7 +323,9 @@ Document::Document(
 			const auto &data = &_parent->data()->history()->owner();
 			_parent->data()->removeFromSharedMediaIndex();
 			setDocumentLinks(_data, realParent, [=] {
-				_openl = nullptr;
+				if (!Core::App().settings().smf().antiRecall()) {
+					_openl = nullptr;
+				}
 
 				auto lifetime = std::make_shared<rpl::lifetime>();
 				TTLVoiceStops(fullId) | rpl::start_with_next([=]() mutable {

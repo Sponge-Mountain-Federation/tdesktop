@@ -93,6 +93,14 @@ bool ReadSetting(
 		Core::App().settings().addFromSerialized(serialized);
 	} break;
 
+	case dbiSMFgramSettings: {
+		auto serialized = QByteArray();
+		stream >> serialized;
+		if (!CheckStreamStatus(stream)) return false;
+
+		Core::App().settings().smf().addFromSerialized(serialized);
+	} break;
+
 	case dbiChatSizeMaxOld: {
 		qint32 maxSize;
 		stream >> maxSize;

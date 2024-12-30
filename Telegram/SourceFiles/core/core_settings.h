@@ -13,6 +13,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/chat/attach/attach_send_files_way.h"
 #include "base/flags.h"
 #include "emoji.h"
+#include "smf_settings.h"
 
 enum class RectPart;
 struct LanguageId;
@@ -111,6 +112,10 @@ public:
 	};
 
 	static constexpr auto kDefaultVolume = 0.9;
+
+	[[nodiscard]] SMFSettings &smf() {
+		return _smfSettings;
+	}
 
 	Settings();
 	~Settings();
@@ -951,6 +956,8 @@ public:
 
 private:
 	void resolveRecentEmoji() const;
+
+	SMFSettings _smfSettings;
 
 	static constexpr auto kDefaultThirdColumnWidth = 0;
 	static constexpr auto kDefaultDialogsWidthRatio = 5. / 14;

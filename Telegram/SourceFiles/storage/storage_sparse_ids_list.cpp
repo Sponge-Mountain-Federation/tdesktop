@@ -62,7 +62,10 @@ SparseIdsList::AddResult SparseIdsList::addRangeItemsAndCountNew(
 		SparseIdsSliceUpdate &update,
 		const Range &messages,
 		MsgRange noSkipRange) {
-	Expects(noSkipRange.from <= noSkipRange.till);
+	//Expects(noSkipRange.from <= noSkipRange.till);
+	if (!(noSkipRange.from <= noSkipRange.till)) {
+		return { 0 }; // SMFgram: fix crash when using `anti-recall`
+	}
 
 	if (noSkipRange.from == noSkipRange.till
 		&& std::begin(messages) == std::end(messages)) {

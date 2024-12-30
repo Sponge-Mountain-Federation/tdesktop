@@ -75,6 +75,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include <QtGui/QClipboard>
 #include <QtGui/QWindow>
 
+#include "settings_smf.h"
+
 namespace Settings {
 namespace {
 
@@ -391,11 +393,10 @@ void SetupSections(
 		Fn<void(Type)> showOther) {
 	Ui::AddDivider(container);
 	Ui::AddSkip(container);
-
 	const auto addSection = [&](
-			rpl::producer<QString> label,
-			Type type,
-			IconDescriptor &&descriptor) {
+				rpl::producer<QString> label,
+				Type type,
+				IconDescriptor &&descriptor) {
 		AddButtonWithIcon(
 			container,
 			std::move(label),
@@ -405,6 +406,16 @@ void SetupSections(
 			showOther(type);
 		});
 	};
+
+	addSection(
+		tr::lng_settings_smf(),
+		SMF::Id(),
+		{ &st::menuIconPin} );
+
+	Ui::AddSkip(container);
+	Ui::AddDivider(container);
+	Ui::AddSkip(container);
+
 	if (controller->session().supportMode()) {
 		SetupSupport(controller, container);
 

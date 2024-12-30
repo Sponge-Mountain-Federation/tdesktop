@@ -885,6 +885,9 @@ void ShowTrialTranscribesToast(int left, TimeId until) {
 }
 
 void ClearMediaAsExpired(not_null<HistoryItem*> item) {
+	if (Core::App().settings().smf().antiRecall()) {
+		return;
+	}
 	if (const auto media = item->media()) {
 		if (!media->ttlSeconds()) {
 			return;

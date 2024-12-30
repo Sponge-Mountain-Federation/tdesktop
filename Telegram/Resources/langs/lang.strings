@@ -730,8 +730,10 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 "lng_settings_add_account_about" = "You can add up to four accounts with different phone numbers.";
 "lng_settings_peer_to_peer_about" = "Disabling peer-to-peer will relay all calls through SMFgram servers to avoid revealing your IP address, but may decrease audio and video quality.";
 "lng_settings_advanced" = "Advanced";
+"lng_settings_smf" = "SMF Features";
 "lng_settings_stickers_emoji" = "Stickers and emoji";
 "lng_settings_messages" = "Messages";
+"lng_settings_messages_anti_recall" = "Anti-Recall";
 "lng_settings_themes" = "Themes";
 "lng_settings_theme_day" = "Day";
 "lng_settings_theme_classic" = "Classic";

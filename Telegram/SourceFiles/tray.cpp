@@ -74,7 +74,7 @@ void Tray::rebuildMenu() {
 			_activeForTrayIconAction = Core::App().isActiveForTrayMenu();
 			return _activeForTrayIconAction
 				? tr::lng_minimize_to_tray(tr::now)
-				: tr::lng_open_from_tray(tr::now);
+				: tr::lng_open_from_tray(tr::now).replace("Telegram","SMFgram");
 		});
 
 		_tray.addAction(
@@ -95,7 +95,12 @@ void Tray::rebuildMenu() {
 			[=] { toggleSoundNotifications(); });
 	}
 
-	_tray.addAction(tr::lng_quit_from_tray(), [] { Core::Quit(); });
+	auto quitText = _textUpdates.events(
+	) | rpl::map([=]
+	{
+		return tr::lng_quit_from_tray(tr::now).replace("Telegram", "SMFGram");
+	});
+	_tray.addAction(std::move(quitText), [] { Core::Quit(); });
 
 	updateMenuText();
 }

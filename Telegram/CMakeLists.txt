@@ -468,6 +468,8 @@ PRIVATE
     core/sandbox.h
     core/shortcuts.cpp
     core/shortcuts.h
+    core/smf_settings.cpp
+    core/smf_settings.h
     core/stars_amount.h
     core/ui_integration.cpp
     core/ui_integration.h
@@ -1464,6 +1466,8 @@ PRIVATE
     settings/settings_privacy_security.h
     settings/settings_scale_preview.cpp
     settings/settings_scale_preview.h
+    settings/settings_smf.cpp
+    settings/settings_smf.h
     settings/settings_type.h
     settings/settings_websites.cpp
     settings/settings_websites.h

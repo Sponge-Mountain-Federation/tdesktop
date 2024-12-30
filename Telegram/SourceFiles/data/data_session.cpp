@@ -207,6 +207,17 @@ void CheckForSwitchInlineButton(not_null<HistoryItem*> item) {
 			double(std::numeric_limits<int>::max())));
 }
 
+bool NeedSaveMessage(not_null<HistoryItem *> item) {
+	if (!Core::App().settings().smf().antiRecall()) {
+		return false;
+	}
+
+	if (const auto possiblyBot = item->history()->peer->asUser()) {
+		return !possiblyBot->isBot();
+	}
+	return true;
+}
+
 } // namespace
 
 Session::Session(not_null<Main::Session*> session)
@@ -2503,8 +2514,21 @@ void Session::unregisterMessageTTL(
 void Session::checkTTLs() {
 	_ttlCheckTimer.cancel();
 	const auto now = base::unixtime::now();
-	while (!_ttlMessages.empty() && _ttlMessages.begin()->first <= now) {
-		_ttlMessages.begin()->second.front()->destroy();
+	if (Core::App().settings().smf().antiRecall()) {
+		auto toBeRemoved = ranges::views::take_while(
+					_ttlMessages,
+					[now](const auto &pair) {
+						return pair.first <= now;
+					}) | ranges::views::transform([](const auto &pair) {
+						return pair.second;
+					}) | ranges::views::join;
+		for (auto &item : toBeRemoved) {
+			item->setDeleted();
+		}
+	} else {
+		while (!_ttlMessages.empty() && _ttlMessages.begin()->first <= now) {
+			_ttlMessages.begin()->second.front()->destroy();
+		}
 	}
 	scheduleNextTTLs();
 }
@@ -2523,7 +2547,11 @@ void Session::processMessagesDeleted(
 		const auto i = list ? list->find(messageId.v) : Messages::iterator();
 		if (list && i != list->end()) {
 			const auto history = i->second->history();
-			i->second->destroy();
+			if (!NeedSaveMessage(i->second)) {
+				i->second->destroy();
+			} else {
+				i->second->setDeleted();
+			}
 			if (!history->chatListMessageKnown()) {
 				historiesToCheck.emplace(history);
 			}
@@ -2541,7 +2569,11 @@ void Session::processNonChannelMessagesDeleted(const QVector<MTPint> &data) {
 	for (const auto &messageId : data) {
 		if (const auto item = nonChannelMessage(messageId.v)) {
 			const auto history = item->history();
-			item->destroy();
+			if (!NeedSaveMessage(item)) {
+				item->destroy();
+			} else {
+				item->setDeleted();
+			}
 			if (!history->chatListMessageKnown()) {
 				historiesToCheck.emplace(history);
 			}
@@ -4367,8 +4399,10 @@ void Session::registerItemView(not_null<ViewElement*> view) {
 }
 
 void Session::unregisterItemView(not_null<ViewElement*> view) {
-	Expects(!_heavyViewParts.contains(view));
-
+	//Expects(!_heavyViewParts.contains(view));
+	if (_heavyViewParts.contains(view)) {
+		view->unloadHeavyPart(); // SMFgram: fix crash when using `anti-recall`
+	}
 	_shownSpoilers.remove(view);
 
 	const auto i = _views.find(view->data());

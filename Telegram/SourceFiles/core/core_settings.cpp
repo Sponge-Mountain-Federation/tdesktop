@@ -1385,6 +1385,8 @@ void Settings::setLegacyEmojiVariants(QMap<QString, int> data) {
 }
 
 void Settings::resetOnLastLogout() {
+	_smfSettings.resetOnLastLogout();
+
 	_adaptiveForWide = true;
 	_moderateModeEnabled = false;
 

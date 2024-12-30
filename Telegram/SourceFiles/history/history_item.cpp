@@ -1703,7 +1703,7 @@ void HistoryItem::setCustomServiceLink(ClickHandlerPtr link) {
 }
 
 void HistoryItem::destroy() {
-	// _history->destroyMessage(this); SMFgram feat: Anti-withdrawal
+	 _history->destroyMessage(this);
 }
 
 not_null<Data::Thread*> HistoryItem::notificationThread() const {
@@ -2254,6 +2254,10 @@ void HistoryItem::setRealId(MsgId newId) {
 }
 
 bool HistoryItem::canPin() const {
+	if (_deleted) {
+		return false;
+	}
+
 	if (!isRegular() || isService()) {
 		return false;
 	} else if (const auto m = media(); m && m->call()) {
@@ -2289,6 +2293,10 @@ bool HistoryItem::isTooOldForEdit(TimeId now) const {
 }
 
 bool HistoryItem::allowsEdit(TimeId now) const {
+	if (_deleted) {
+		return false;
+	}
+
 	return !isService()
 		&& canBeEdited()
 		&& !isTooOldForEdit(now)
@@ -2303,6 +2311,10 @@ bool HistoryItem::allowsEditMedia() const {
 }
 
 bool HistoryItem::canBeEdited() const {
+	if (_deleted) {
+		return false;
+	}
+
 	if ((!isRegular() && !isScheduled() && !isBusinessShortcut())
 		|| Has<HistoryMessageVia>()
 		|| Has<HistoryMessageForwarded>()) {
@@ -2413,6 +2425,9 @@ bool HistoryItem::canDeleteForEveryone(TimeId now) const {
 }
 
 bool HistoryItem::suggestReport() const {
+	if (_deleted) {
+		return false;
+	}
 	if (out() || isService() || !isRegular()) {
 		return false;
 	} else if (const auto channel = _history->peer->asChannel()) {
@@ -2424,6 +2439,9 @@ bool HistoryItem::suggestReport() const {
 }
 
 bool HistoryItem::suggestBanReport() const {
+	if (_deleted) {
+		return false;
+	}
 	const auto channel = _history->peer->asChannel();
 	if (!channel || !channel->canRestrictParticipant(from())) {
 		return false;
@@ -2432,6 +2450,9 @@ bool HistoryItem::suggestBanReport() const {
 }
 
 bool HistoryItem::suggestDeleteAllReport() const {
+	if (_deleted) {
+		return false;
+	}
 	auto channel = _history->peer->asChannel();
 	if (!channel || !channel->canDeleteMessages()) {
 		return false;
@@ -2582,6 +2603,9 @@ void HistoryItem::translationDone(LanguageId to, TextWithEntities result) {
 }
 
 bool HistoryItem::canReact() const {
+	if (_deleted) {
+		return false;
+	}
 	if (!isRegular() || isService()) {
 		return false;
 	} else if (const auto media = this->media()) {
@@ -3905,6 +3929,60 @@ TextWithEntities HistoryItem::withLocalEntities(
 		}
 	}
 	return textWithEntities;
+}
+
+void HistoryItem::setDeleted() {
+	_deleted = true;
+	setDeletedHint("Deleted");
+
+}
+bool HistoryItem::isDeleted() const {
+	return _deleted;
+}
+
+void HistoryItem::setDeletedHint(const QString& hint) {
+	try {
+		if (!(_flags & MessageFlag::HasPostAuthor)) {
+			_flags |= MessageFlag::HasPostAuthor;
+		}
+
+		auto msgsigned = Get<HistoryMessageSigned>();
+		if (hint.isEmpty()) {
+			if (!msgsigned) {
+				return;
+			}
+			RemoveComponents(HistoryMessageSigned::Bit());
+			history()->owner().requestItemResize(this);
+			return;
+		}
+
+		if (!isService()) {
+			if (!msgsigned) {
+				AddComponents(HistoryMessageSigned::Bit());
+				msgsigned = Get<HistoryMessageSigned>();
+			} else if (msgsigned->author == hint) {
+				return;
+			}
+			msgsigned->author = hint;
+			msgsigned->isAnonymousRank = !isDiscussionPost()
+				&& this->author()->isMegagroup();
+		} else {
+			const auto data = Get<HistoryServiceData>();
+			const auto postfix = QString(" (%1)").arg(hint);
+			if (!_text.text.endsWith(postfix)) { // fix stacking for TTL messages
+				auto prepared = PreparedServiceText{
+				.text = _text.append(postfix),
+				.links = data->textLinks
+			};
+				setServiceText(std::move(prepared));
+			}
+		}
+
+		history()->owner().requestItemViewRefresh(this);
+		history()->owner().requestItemResize(this);
+	} catch (...) {
+		DEBUG_LOG(("AyuGram: crash in setting hint"));
+	}
 }
 
 void HistoryItem::createComponentsHelper(HistoryItemCommonFields &&fields) {

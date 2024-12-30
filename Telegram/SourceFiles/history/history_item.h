@@ -418,6 +418,9 @@ public:
 		bool isForumPost);
 	void setPostAuthor(const QString &author);
 	void setRealId(MsgId newId);
+	void setDeleted();
+	bool isDeleted() const;
+	void setDeletedHint(const QString &hint);
 	void incrementReplyToTopCounter();
 	void applyEffectWatchedOnUnreadKnown();
 
@@ -677,6 +680,8 @@ private:
 	std::unique_ptr<Data::Media> _media;
 	std::unique_ptr<Data::MessageReactions> _reactions;
 	crl::time _reactionsLastRefreshed = 0;
+
+	bool _deleted = false;
 
 	TimeId _date = 0;
 	TimeId _ttlDestroyAt = 0;
