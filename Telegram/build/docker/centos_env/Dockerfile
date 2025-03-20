@@ -44,7 +44,7 @@ FROM builder AS patches
 RUN git init patches \
 	&& cd patches \
 	&& git remote add origin {{ GIT }}/desktop-app/patches.git \
-	&& git fetch --depth=1 origin 61bbacab28d377d0a2771cc87e008554e2f23ffb \
+	&& git fetch --depth=1 origin fb35ec726cf0a99eead201ddf80e1e717b9fa7c2 \
 	&& git reset --hard FETCH_HEAD \
 	&& rm -rf .git
 
@@ -489,6 +489,8 @@ RUN git clone -b n6.1.1 --depth=1 {{ GIT }}/FFmpeg/FFmpeg.git \
 		--extra-cflags="-DCONFIG_SAFE_BITSTREAM_READER=1" \
 		--extra-cxxflags="-DCONFIG_SAFE_BITSTREAM_READER=1" \
 		--disable-debug \
+		--disable-optimizations \
+		--disable-inline-asm \
 		--disable-programs \
 		--disable-doc \
 		--disable-network \

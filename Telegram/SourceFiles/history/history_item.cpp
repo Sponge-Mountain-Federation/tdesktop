@@ -304,7 +304,7 @@ std::unique_ptr<Data::Media> HistoryItem::CreateMedia(
 		return document->match([&](const MTPDdocument &document) -> Result {
 			const auto list = media.valt_documents();
 			const auto owner = &item->history()->owner();
-			const auto data = owner->processDocument(document);
+			const auto data = owner->processDocument(document, list);
 			using Args = Data::MediaFile::Args;
 			return std::make_unique<Data::MediaFile>(item, data, Args{
 				.ttlSeconds = media.vttl_seconds().value_or_empty(),
@@ -401,6 +401,7 @@ HistoryItem::HistoryItem(
 	.from = data.vfrom_id() ? peerFromMTP(*data.vfrom_id()) : PeerId(0),
 	.date = data.vdate().v,
 	.shortcutId = data.vquick_reply_shortcut_id().value_or_empty(),
+	.starsPaid = int(data.vpaid_message_stars().value_or_empty()),
 	.effectId = data.veffect().value_or_empty(),
 }) {
 	_boostsApplied = data.vfrom_boosts_applied().value_or_empty();
@@ -745,6 +746,7 @@ HistoryItem::HistoryItem(
 	: history->peer)
 , _flags(FinalizeMessageFlags(history, fields.flags))
 , _date(fields.date)
+, _starsPaid(fields.starsPaid)
 , _shortcutId(fields.shortcutId)
 , _effectId(fields.effectId) {
 	Expects(!_shortcutId
@@ -791,6 +793,10 @@ HistoryItem::~HistoryItem() {
 
 TimeId HistoryItem::date() const {
 	return _date;
+}
+
+int HistoryItem::starsPaid() const {
+	return _starsPaid;
 }
 
 bool HistoryItem::awaitingVideoProcessing() const {
@@ -2260,6 +2266,10 @@ void HistoryItem::setRealId(MsgId newId) {
 	if (const auto reply = Get<HistoryMessageReply>()) {
 		incrementReplyToTopCounter();
 	}
+
+	if (out() && starsPaid()) {
+		_history->session().credits().load(true);
+	}
 }
 
 bool HistoryItem::canPin() const {
@@ -2410,7 +2420,8 @@ bool HistoryItem::canDeleteForEveryone(TimeId now) const {
 	} else if (const auto user = peer->asUser()) {
 		// Bots receive all messages and there is no sense in revoking them.
 		// See https://github.com/telegramdesktop/tdesktop/issues/3818
-		if (user->isBot() && !user->isSupport()) {
+		if ((user->isBot() && !user->isSupport())
+			|| user->isInaccessible()) {
 			return false;
 		}
 	}

@@ -15,6 +15,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/history.h"
 #include "history/history_drag_area.h"
 #include "history/history_item_helpers.h" // GetErrorForSending.
+#include "history/history_view_swipe_back_session.h"
 #include "menu/menu_send.h" // SendMenu::Type.
 #include "ui/widgets/buttons.h"
 #include "ui/widgets/tooltip.h"
@@ -245,6 +246,7 @@ ScheduledWidget::ScheduledWidget(
 		_inner->setEmptyInfoWidget(std::move(emptyInfo));
 	}
 	setupComposeControls();
+	Window::SetupSwipeBackSection(this, _scroll, _inner);
 }
 
 ScheduledWidget::~ScheduledWidget() = default;
@@ -909,7 +911,7 @@ bool ScheduledWidget::sendExistingPhoto(
 }
 
 void ScheduledWidget::sendInlineResult(
-		not_null<InlineBots::Result*> result,
+		std::shared_ptr<InlineBots::Result> result,
 		not_null<UserData*> bot) {
 	if (const auto error = result->getErrorOnSend(_history)) {
 		Data::ShowSendErrorToast(controller(), _history->peer, error);
@@ -923,12 +925,16 @@ void ScheduledWidget::sendInlineResult(
 }
 
 void ScheduledWidget::sendInlineResult(
-		not_null<InlineBots::Result*> result,
+		std::shared_ptr<InlineBots::Result> result,
 		not_null<UserData*> bot,
 		Api::SendOptions options) {
 	auto action = prepareSendAction(options);
 	action.generateLocal = true;
-	session().api().sendInlineResult(bot, result, action, std::nullopt);
+	session().api().sendInlineResult(
+		bot,
+		result.get(),
+		action,
+		std::nullopt);
 
 	_composeControls->clear();
 	//_saveDraftText = true;
