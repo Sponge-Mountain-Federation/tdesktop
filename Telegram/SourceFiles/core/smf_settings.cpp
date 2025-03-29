@@ -19,6 +19,8 @@ QByteArray SMFSettings::serialize() const {
         stream.setVersion(QDataStream::Qt_5_1);
         stream
             << qint32(_antiRecall ? 1 : 0);
+        stream
+            << qint32(_spamFilter ? 1 : 0);
     }
     return result;
 }
@@ -32,10 +34,13 @@ void SMFSettings::addFromSerialized(const QByteArray& serialized) {
     stream.setVersion(QDataStream::Qt_5_1);
 
     qint32 antiRecall = _antiRecall;
+    qint32 spamFilter = _spamFilter;
 
     if (!stream.atEnd()) {
         stream
             >> antiRecall;
+        stream
+            >> spamFilter;
     }
 
     if (stream.status() != QDataStream::Ok) {
@@ -44,9 +49,11 @@ void SMFSettings::addFromSerialized(const QByteArray& serialized) {
         return;
     }
     _antiRecall = (antiRecall == 1);
+    _spamFilter = (spamFilter == 1);
 }
 
 void SMFSettings::resetOnLastLogout() {
     _antiRecall = true;
+    _spamFilter = true;
 }
 }

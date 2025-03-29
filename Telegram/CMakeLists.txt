@@ -897,6 +897,8 @@ PRIVATE
     history/view/history_view_view_button.h
     history/view/history_view_webpage_preview.cpp
     history/view/history_view_webpage_preview.h
+    history/aho_corasick.cpp
+    history/aho_corasick.h
     history/history.cpp
     history/history.h
     history/history_drag_area.cpp

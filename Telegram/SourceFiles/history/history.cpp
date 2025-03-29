@@ -69,11 +69,19 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "base/unixtime.h"
 #include "base/qt/qt_common_adapters.h"
 #include "styles/style_dialogs.h"
+#include "history/aho_corasick.h"
 
 namespace {
 
 constexpr auto kNewBlockEachMessage = 50;
 constexpr auto kSkipCloudDraftsFor = TimeId(2);
+auto ac = AhoCorasick({"极搜帮你精准找到想要的群组",
+	"进群尊享永久售后保障","安全有保障","享受高质量资源与超值服务","关注精彩车队","互推",
+	"永不失联","你的好友分享了一个红包","广告合作","稳定更新","机场推荐","翻墙加速器我推荐",
+	"#置底","校园名器","频道推荐","TG极速搜索","点击下面进入","频道种类齐全","优质频道","点这里马上玩",
+	"点击下方链接","私人定制","注册送","博彩平台","24小时在线","入群机器人","【华人社区】","诚招代理",
+	"不断的更新上传","全国安排","推荐机场","点击下面链接","靠谱无骗子","免门槛","无门槛","进内群","安全靠谱",
+	"关注本频道","官方管理员", "先赚钱后收费", "官方代理","薪资范围","年底分红","合法办公","TG必备","Telegram必备","CLICK HERE","全网开车俱乐部"});
 
 using UpdateFlag = Data::HistoryUpdate::Flag;
 
@@ -1386,6 +1394,12 @@ void History::viewReplaced(not_null<const Element*> was, Element *now) {
 
 void History::addItemToBlock(not_null<HistoryItem*> item) {
 	Expects(!item->mainView());
+
+	if (Core::App().settings().smf().spamFilter()) {
+		if (ac.containsAnyKeyword(item->originalText().text.toStdString())) {
+			return;
+		}
+	}
 
 	auto block = prepareBlockForAddingItem();
 

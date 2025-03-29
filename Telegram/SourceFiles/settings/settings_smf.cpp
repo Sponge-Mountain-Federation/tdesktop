@@ -58,7 +58,13 @@ void SetupChat(
             Core::App().settings().smf().setAntiRecall(checked);
             Core::App().saveSettings();
         });
-
+    add(
+        tr::lng_settings_messages_spam_filter(tr::now),
+        Core::App().settings().smf().spamFilter(),
+        [=](bool checked) {
+            Core::App().settings().smf().setSpamFilter(checked);
+            Core::App().saveSettings();
+        });
     Ui::AddSkip(container, st::settingsCheckboxesSkip);
     Ui::AddSkip(container);
 }

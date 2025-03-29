@@ -21,7 +21,16 @@ public:
         _antiRecall = newValue;
     }
 
+    [[nodiscard]] bool spamFilter() const {
+        return _spamFilter;
+    }
+
+    void setSpamFilter(bool newValue) {
+        _spamFilter = newValue;
+    }
+
 private:
     bool _antiRecall = true;
+    bool _spamFilter = true;
 };
 }
